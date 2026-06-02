@@ -33,24 +33,27 @@
 
     <section id="dashboard" class="section dashboard">
       <div class="dashboard-panel">
-        <h2>Панель анализа</h2>
+        <h2>Панель управления</h2>
         <div class="dashboard-grid">
-          <div class="chart-card">
-            <h3>Трафик по протоколам</h3>
-            <div class="bar-chart" id="protocolChart"></div>
-          </div>
-          <div class="chart-card">
-            <h3>Подозрительные события</h3>
-            <ul id="alertList" class="alerts"></ul>
-          </div>
           <div class="chart-card full-width">
-            <h3>Последние сетевые соединения</h3>
-            <table>
-              <thead>
-                <tr><th>Источник</th><th>Назначение</th><th>Протокол</th><th>Статус</th></tr>
-              </thead>
-              <tbody id="connectionTable"></tbody>
-            </table>
+            <h3>Вставь ссылку</h3>
+            <form id="urlForm" class="url-form">
+              <input type="url" id="urlInput" placeholder="https://example.com" required />
+              <button type="submit" class="btn">Показать</button>
+            </form>
+            <div class="url-result" id="urlResult">
+              <p>Вставь ссылку выше, чтобы показать её в панели.</p>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Статус</h3>
+            <p id="statusText">Ожидание ссылки...</p>
+          </div>
+          <div class="chart-card">
+            <h3>Превью ссылки</h3>
+            <div class="preview-frame" id="previewFrame">
+              Вставь ссылку, чтобы увидеть предпросмотр.
+            </div>
           </div>
         </div>
       </div>
