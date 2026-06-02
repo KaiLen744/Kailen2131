@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Анализ сети и обнаружение угроз</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Анализ трафика сети и обнаружение подозрительной активности</h1>
+      <p>Простой интерфейс для визуализации сетевых событий, анализа пакетов и обнаружения угроз.</p>
+      <a href="#dashboard" class="btn">Перейти к панели</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="features" class="section cards">
+      <article class="card">
+        <h2>Мониторинг трафика</h2>
+        <p>Отслеживай потоки данных и выявляй аномалии в реальном времени.</p>
+      </article>
+      <article class="card">
+        <h2>Выявление угроз</h2>
+        <p>Определяй подозрительные подключения, сканеры и несанкционированные попытки доступа.</p>
+      </article>
+      <article class="card">
+        <h2>Аналитика</h2>
+        <p>Графики по пакетам, поузловой активности и общая картина сети.</p>
+      </article>
+    </section>
+
+    <section id="dashboard" class="section dashboard">
+      <div class="dashboard-panel">
+        <h2>Панель анализа</h2>
+        <div class="dashboard-grid">
+          <div class="chart-card">
+            <h3>Трафик по протоколам</h3>
+            <div class="bar-chart" id="protocolChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Подозрительные события</h3>
+            <ul id="alertList" class="alerts"></ul>
+          </div>
+          <div class="chart-card full-width">
+            <h3>Последние сетевые соединения</h3>
+            <table>
+              <thead>
+                <tr><th>Источник</th><th>Назначение</th><th>Протокол</th><th>Статус</th></tr>
+              </thead>
+              <tbody id="connectionTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Сайт создан для демонстрации анализа сетевого трафика и обнаружения подозрительной активности.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
