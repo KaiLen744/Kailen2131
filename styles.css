@@ -138,7 +138,8 @@ body {
   text-decoration: underline;
 }
 
-.analysis-result {
+.analysis-result,
+.activity-result {
   margin-top: 18px;
   padding: 18px 16px;
   border-radius: 18px;
@@ -146,7 +147,8 @@ body {
   border: 1px solid rgba(148,163,184,0.12);
 }
 
-.analysis-result dl {
+.analysis-result dl,
+.activity-result dl {
   display: grid;
   gap: 10px;
 }

@@ -3,6 +3,7 @@ const urlInput = document.getElementById('urlInput');
 const urlResult = document.getElementById('urlResult');
 const statusText = document.getElementById('statusText');
 const previewFrame = document.getElementById('previewFrame');
+const activityResult = document.getElementById('activityResult');
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -50,8 +51,12 @@ async function analyzeUrl(url) {
     }).length;
     const external = links.length - internal;
     const scripts = doc.querySelectorAll('script').length;
+    const images = doc.querySelectorAll('img').length;
+    const stylesheets = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).length;
     const pageSize = new TextEncoder().encode(text).length;
     const https = url.startsWith('https://');
+    const activityScore = calculateActivityScore({ links, scripts, images, stylesheets, elapsed, https });
+    const activityLabel = activityScore >= 75 ? 'Высокая' : activityScore >= 45 ? 'Средняя' : 'Низкая';
 
     statusText.textContent = `Анализ завершён за ${elapsed} мс. Статус HTTP ${response.status}.`;
     analysisResult.innerHTML = `
@@ -63,14 +68,36 @@ async function analyzeUrl(url) {
         <div><dt>Размер HTML</dt><dd>${pageSize.toLocaleString()} байт</dd></div>
         <div><dt>Ссылок на странице</dt><dd>${links.length} (внутренних ${internal}, внешних ${external})</dd></div>
         <div><dt>Скриптов</dt><dd>${scripts}</dd></div>
+        <div><dt>Изображений</dt><dd>${images}</dd></div>
+        <div><dt>CSS-файлов</dt><dd>${stylesheets}</dd></div>
         <div><dt>Время ответа</dt><dd>${elapsed} мс</dd></div>
+      </dl>
+    `;
+
+    activityResult.innerHTML = `
+      <dl>
+        <div><dt>Уровень активности</dt><dd>${activityLabel}</dd></div>
+        <div><dt>Баллы активности</dt><dd>${activityScore} / 100</dd></div>
+        <div><dt>Интерактивных ресурсов</dt><dd>${scripts + stylesheets} (${scripts} JS, ${stylesheets} CSS)</dd></div>
+        <div><dt>Графических элементов</dt><dd>${images}</dd></div>
       </dl>
     `;
   } catch (error) {
     const message = error.message || 'Ошибка сети';
     statusText.textContent = `Не удалось проанализировать сайт: ${message}`;
     analysisResult.innerHTML = `<p>Анализ не выполнен. ${message}</p>`;
+    activityResult.innerHTML = `<p>Активность не определена. Проверь URL и доступность сайта.</p>`;
   }
+}
+
+function calculateActivityScore({ links, scripts, images, stylesheets, elapsed, https }) {
+  const linkScore = Math.min(links / 20, 1) * 30;
+  const scriptScore = Math.min(scripts / 10, 1) * 25;
+  const imageScore = Math.min(images / 20, 1) * 20;
+  const cssScore = Math.min(stylesheets / 10, 1) * 15;
+  const speedScore = Math.max(0, 20 - elapsed / 100) ;
+  const httpsScore = https ? 10 : 0;
+  return Math.round(Math.min(100, linkScore + scriptScore + imageScore + cssScore + speedScore + httpsScore));
 }
 
 function escapeHtml(text) {
