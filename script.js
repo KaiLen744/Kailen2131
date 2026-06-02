@@ -19,9 +19,68 @@ form.addEventListener('submit', event => {
   }
 
   urlResult.innerHTML = `<p>Введённая ссылка: <a href="${url}" target="_blank" rel="noreferrer">${url}</a></p>`;
-  statusText.textContent = 'Ссылка принята. Если сайт не отображается, он может блокировать загрузку в iframe.';
+  statusText.textContent = 'Анализ сайта запущен...';
   previewFrame.innerHTML = `<iframe src="${url}" title="Превью ссылки"></iframe>`;
+  analyzeUrl(url);
 });
+
+async function analyzeUrl(url) {
+  const analysisResult = document.getElementById('analysisResult');
+  analysisResult.innerHTML = '<p>Выполняется анализ…</p>';
+
+  const start = performance.now();
+  try {
+    const response = await fetch(url, { cache: 'no-store' });
+    const elapsed = Math.round(performance.now() - start);
+    const text = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+
+    const title = doc.querySelector('title')?.textContent?.trim() || 'Не найдено';
+    const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || 'Не указано';
+    const links = Array.from(doc.querySelectorAll('a[href]'));
+    const base = new URL(url);
+    const internal = links.filter(link => {
+      try {
+        const href = new URL(link.getAttribute('href'), base);
+        return href.origin === base.origin;
+      } catch {
+        return false;
+      }
+    }).length;
+    const external = links.length - internal;
+    const scripts = doc.querySelectorAll('script').length;
+    const pageSize = new TextEncoder().encode(text).length;
+    const https = url.startsWith('https://');
+
+    statusText.textContent = `Анализ завершён за ${elapsed} мс. Статус HTTP ${response.status}.`;
+    analysisResult.innerHTML = `
+      <dl>
+        <div><dt>Статус HTTP</dt><dd>${response.status} ${response.statusText}</dd></div>
+        <div><dt>Заголовок страницы</dt><dd>${escapeHtml(title)}</dd></div>
+        <div><dt>Описание</dt><dd>${escapeHtml(description)}</dd></div>
+        <div><dt>HTTPS</dt><dd>${https ? 'Да' : 'Нет'}</dd></div>
+        <div><dt>Размер HTML</dt><dd>${pageSize.toLocaleString()} байт</dd></div>
+        <div><dt>Ссылок на странице</dt><dd>${links.length} (внутренних ${internal}, внешних ${external})</dd></div>
+        <div><dt>Скриптов</dt><dd>${scripts}</dd></div>
+        <div><dt>Время ответа</dt><dd>${elapsed} мс</dd></div>
+      </dl>
+    `;
+  } catch (error) {
+    const message = error.message || 'Ошибка сети';
+    statusText.textContent = `Не удалось проанализировать сайт: ${message}`;
+    analysisResult.innerHTML = `<p>Анализ не выполнен. ${message}</p>`;
+  }
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 function normalizeUrl(value) {
   try {
